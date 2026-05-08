@@ -47,6 +47,10 @@ API_BASES = [
     "https://api-inference.huggingface.co/models",
 ]
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
+if not HF_TOKEN:
+    _token_file = Path(__file__).parent.parent / ".hf_token"
+    if _token_file.exists():
+        HF_TOKEN = _token_file.read_text().strip()
 
 # ============================================================
 # 图片风格前缀 - 白/灰底色用于运行时着色

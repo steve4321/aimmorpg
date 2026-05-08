@@ -9,3 +9,4 @@ export/
 *.jpg.import
 *.webp.import
 *.uid
+.hf_token
