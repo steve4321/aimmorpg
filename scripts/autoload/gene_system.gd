@@ -70,23 +70,66 @@ static func breed(parent_a_type: String, parent_b_type: String,
 
 ## 检查颜色是否触发稀有花
 static func check_rare(color: Dictionary, group: int) -> String:
+	# 黑玫瑰：蔷薇系，极暗
+	if group == PlantData.BreedingGroup.ROSE:
+		if color.r < 30 and color.g < 30 and color.b < 30:
+			return "black_rose"
+	# 樱吹雪：蔷薇系，纯净粉白
+	if group == PlantData.BreedingGroup.ROSE:
+		if color.r > 240 and color.g > 230 and color.b > 245:
+			return "sakura_blizzard"
 	# 彩虹玫瑰：蔷薇系培育时，RGB均>200
 	if group == PlantData.BreedingGroup.ROSE:
 		if color.r > RARE_RGB_HIGH and color.g > RARE_RGB_HIGH and color.b > RARE_RGB_HIGH:
 			return "rainbow_rose"
-	# 金色向日葵：菊系培育时
-	if group == PlantData.BreedingGroup.DAISY:
-		if color.r > RARE_RGB_HIGH and color.g > RARE_GOLDEN_G and color.b < RARE_RGB_LOW:
-			return "golden_sunflower"
+	# 雪后：百合系，冰白
+	if group == PlantData.BreedingGroup.LILY:
+		if color.r > 230 and color.g > 240 and color.b > 245:
+			return "snow_queen"
+	# 午夜百合：百合系，深邃紫夜
+	if group == PlantData.BreedingGroup.LILY:
+		if color.r < 60 and color.b > 100 and color.g < 50:
+			return "midnight_lily"
 	# 月光百合：百合系培育时
 	if group == PlantData.BreedingGroup.LILY:
 		if color.r < RARE_MOONLIGHT_LOW and color.g > RARE_MOONLIGHT_G and color.b > RARE_MOONLIGHT_G:
 			return "moonlight_lily"
+	# 蓝色雏菊：菊系，蓝色主导
+	if group == PlantData.BreedingGroup.DAISY:
+		if color.b > 220 and color.r < 100:
+			return "blue_daisy"
+	# 金色向日葵：菊系培育时
+	if group == PlantData.BreedingGroup.DAISY:
+		if color.r > RARE_RGB_HIGH and color.g > RARE_GOLDEN_G and color.b < RARE_RGB_LOW:
+			return "golden_sunflower"
+	# 幽灵兰：兰系，幽灵绿
+	if group == PlantData.BreedingGroup.ORCHID:
+		if color.g > 230 and color.r < 220 and color.b < 220:
+			return "ghost_orchid"
+	# 极光花：兰系，极光绿蓝
+	if group == PlantData.BreedingGroup.ORCHID:
+		if color.g > 180 and color.b > 180 and color.r < 150:
+			return "aurora_borealis"
+	# 永恒之花：兰系培育时，RGB均>230（神话白花）
+	if group == PlantData.BreedingGroup.ORCHID:
+		if color.r > 230 and color.g > 230 and color.b > 230:
+			return "eternal_flower"
+	# 水晶莲：多肉系，水晶蓝绿
+	if group == PlantData.BreedingGroup.SUCCULENT:
+		if color.b > 200 and color.g > 200 and color.r < 180:
+			return "crystal_succulent"
+	# 金琥：仙人掌系，金色
+	if group == PlantData.BreedingGroup.CACTUS:
+		if color.r > 200 and color.g > 180 and color.b < 80:
+			return "golden_cactus"
+	# 凤凰花：任意组，烈焰橙红
+	if color.r > 230 and color.g > 80 and color.g < 150 and color.b < 50:
+		return "phoenix_flower"
 	# 暗夜曼陀罗：任意培育
 	if color.r < RARE_RGB_LOW and color.g < RARE_RGB_LOW and color.b < RARE_RGB_LOW:
 		return "dark_mandrake"
-	# 永恒之花：fallback
-	return "eternal_flower"
+	# 未触发任何稀有条件
+	return ""
 
 
 ## 两个不同培育组能否培育
@@ -112,5 +155,15 @@ static func _rare_type_to_plant(rare_type: String) -> String:
 		"golden_sunflower": "rare_golden_sunflower",
 		"moonlight_lily": "rare_moonlight_lily",
 		"eternal_flower": "rare_eternal_flower",
+		"black_rose": "rare_black_rose",
+		"snow_queen": "rare_snow_queen",
+		"blue_daisy": "rare_blue_daisy",
+		"ghost_orchid": "rare_ghost_orchid",
+		"crystal_succulent": "rare_crystal_succulent",
+		"golden_cactus": "rare_golden_cactus",
+		"phoenix_flower": "rare_phoenix_flower",
+		"aurora_borealis": "rare_aurora_borealis",
+		"sakura_blizzard": "rare_sakura_blizzard",
+		"midnight_lily": "rare_midnight_lily",
 	}
 	return mapping.get(rare_type, "")

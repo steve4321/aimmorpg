@@ -10,6 +10,7 @@ signal cancelled()
 @onready var cancel_btn: Button = $Panel/Margin/VBox/CancelButton
 
 var _plot_index: int = -1
+var _remove_confirming: bool = false
 
 
 func _ready() -> void:
@@ -20,6 +21,7 @@ func _ready() -> void:
 
 func popup(plot_index: int, plant_name: String) -> void:
 	_plot_index = plot_index
+	_remove_confirming = false
 	storage_btn.text = "📦 收入仓库 — %s" % plant_name
 	remove_btn.text = "🗑 移除"
 	show()
@@ -31,6 +33,10 @@ func _on_storage_pressed() -> void:
 
 
 func _on_remove_pressed() -> void:
+	if not _remove_confirming:
+		_remove_confirming = true
+		remove_btn.text = "⚠️ 确认移除？"
+		return
 	remove_plant.emit(_plot_index)
 	hide()
 

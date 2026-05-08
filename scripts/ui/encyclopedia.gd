@@ -53,7 +53,11 @@ func _refresh() -> void:
         if data.is_empty():
             continue
         var category: String = data.get("category", "flower")
-        if _current_filter == "all" or _current_filter == category:
+        # "succulent" 筛选同时包含仙人掌类
+        var match_filter := (_current_filter == "all"
+            or _current_filter == category
+            or (_current_filter == "succulent" and category == "cactus"))
+        if match_filter:
             filtered.append(plant_type)
 
     var discovered: int = 0

@@ -117,9 +117,12 @@ static func from_dictionary(data: Dictionary) -> Plant:
 	p.id = data.get("id", p.id)
 	p.display_name = data.get("display_name", "")
 	p.breeding_group = data.get("breeding_group", "")
-	p.stage = data.get("stage", 0) as Stage
+	var stage_val: int = data.get("stage", 0)
+	if stage_val < 0 or stage_val > 4:
+		stage_val = 0
+	p.stage = stage_val as Stage
 	p.water_count = data.get("water_count", 0)
-	p.stage_water_count = data.get("stage_water_count", 0)
+	p.stage_water_count = maxi(data.get("stage_water_count", 0), 0)
 	p.shape = data.get("shape", 0)
 	p.size = data.get("size", 1)
 	p.is_rare = data.get("is_rare", false)
@@ -131,4 +134,4 @@ static func from_dictionary(data: Dictionary) -> Plant:
 
 
 func _generate_id() -> String:
-	return "p_%d_%d" % [Time.get_ticks_msec(), randi() % 100000]
+	return "p_%d_%d" % [Time.get_ticks_msec(), randi() % 1000000]

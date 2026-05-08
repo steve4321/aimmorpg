@@ -3,6 +3,9 @@ extends Node
 
 const SAVE_PATH := "user://save.json"
 
+var _save_timer: float = 0.0
+var _save_pending: bool = false
+
 
 func _ready() -> void:
 	EventBus.plant_watered.connect(_on_state_changed)
@@ -10,13 +13,20 @@ func _ready() -> void:
 	EventBus.plant_removed.connect(_on_state_changed)
 	EventBus.stage_advanced.connect(_on_state_changed)
 	EventBus.breeding_started.connect(_on_state_changed)
-	EventBus.breeding_revealed.connect(_on_state_changed)
 	EventBus.breeding_done.connect(_on_state_changed)
 	EventBus.flower_discovered.connect(_on_state_changed)
 	EventBus.garden_expanded.connect(_on_state_changed)
 	EventBus.desktop_changed.connect(_on_state_changed)
 	EventBus.flower_stored.connect(_on_state_changed)
 	EventBus.flower_retrieved.connect(_on_state_changed)
+
+
+func _process(delta: float) -> void:
+	if _save_pending:
+		_save_timer -= delta
+		if _save_timer <= 0.0:
+			_save_pending = false
+			save_game()
 
 
 func has_save() -> bool:
@@ -36,6 +46,8 @@ func save_game() -> void:
 		file.store_string(json_str)
 		file.close()
 		EventBus.game_saved.emit()
+	else:
+		push_warning("Failed to open save file: %s" % SAVE_PATH)
 
 
 func load_game() -> bool:
@@ -61,6 +73,7 @@ func load_game() -> bool:
 
 
 func new_game() -> void:
+	GameState.garden_size = 6
 	GameState.garden_plots.clear()
 	GameState.garden_plots.resize(GameState.garden_size)
 	GameState.garden_plots.fill(null)
@@ -68,7 +81,12 @@ func new_game() -> void:
 	GameState.flower_storage.clear()
 	GameState.seed_inventory = ["rose_red", "daisy_white", "tulip_yellow"]
 	GameState.encyclopedia = {}
+	if has_save():
+		var dir := DirAccess.open("user://")
+		if dir != null:
+			dir.remove("save.json")
 
 
 func _on_state_changed(_arg = null) -> void:
-	save_game()
+	_save_pending = true
+	_save_timer = 1.0

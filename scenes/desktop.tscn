@@ -62,8 +62,20 @@ custom_minimum_size = Vector2(80, 40)
 theme_override_font_sizes/font_size = 14
 text = "🌿 花圃"
 
+[node name="EncyclopediaButton" type="Button" parent="VBox/Bar"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 40)
+theme_override_font_sizes/font_size = 14
+text = "📖 图鉴"
+
 [node name="BreedingRoomButton" type="Button" parent="VBox/Bar"]
 layout_mode = 2
 custom_minimum_size = Vector2(80, 40)
 theme_override_font_sizes/font_size = 14
 text = "🌱 培育室"
+
+[node name="ClearVaseButton" type="Button" parent="VBox/Bar"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 40)
+theme_override_font_sizes/font_size = 14
+text = "🗑 清空花瓶"

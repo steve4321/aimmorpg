@@ -3,14 +3,18 @@ extends Control
 
 const IDLE_SCRIPT: GDScript = preload("res://scripts/desktop/idle_animator.gd")
 const ARRANGE_SCENE: PackedScene = preload("res://scenes/ui/flower_arrange.tscn")
+const ENCYCLOPEDIA_SCENE: PackedScene = preload("res://scenes/ui/encyclopedia.tscn")
 
 @onready var vase_area: PanelContainer = $VBox/Center/VaseArea
 @onready var flower_container: HFlowContainer = $VBox/Center/VaseArea/VBox/FlowerContainer
 @onready var empty_hint: Label = $VBox/Center/VaseArea/VBox/EmptyHint
 @onready var garden_btn: Button = $VBox/Bar/GardenButton
+@onready var encyclopedia_btn: Button = $VBox/Bar/EncyclopediaButton
 @onready var breeding_room_btn: Button = $VBox/Bar/BreedingRoomButton
+@onready var clear_vase_btn: Button = $VBox/Bar/ClearVaseButton
 
 var arrange_popup: Control = null
+var encyclopedia: Control = null
 var _flower_widgets: Array = []  # [{ "icon": Label, "name": Label, "animator": Node }]
 
 
@@ -25,6 +29,10 @@ func _ready() -> void:
 	arrange_popup.flower_added.connect(_on_flower_added)
 	arrange_popup.done.connect(_on_arrange_done)
 
+	# 创建图鉴弹窗
+	encyclopedia = ENCYCLOPEDIA_SCENE.instantiate()
+	add_child(encyclopedia)
+
 
 func _load_save() -> void:
 	if SaveManager.has_save():
@@ -35,7 +43,9 @@ func _load_save() -> void:
 
 func _connect_signals() -> void:
 	garden_btn.pressed.connect(_on_garden_btn_pressed)
+	encyclopedia_btn.pressed.connect(_on_encyclopedia_btn_pressed)
 	breeding_room_btn.pressed.connect(_on_breeding_room_btn_pressed)
+	clear_vase_btn.pressed.connect(_on_clear_vase_pressed)
 	vase_area.gui_input.connect(_on_vase_input)
 	EventBus.desktop_changed.connect(_on_desktop_changed)
 	EventBus.game_loaded.connect(_on_game_loaded)
@@ -83,6 +93,10 @@ func _refresh_vase() -> void:
 		name_lbl.add_theme_font_size_override("font_size", 10)
 		vbox.add_child(name_lbl)
 
+		# 右键移除单朵花
+		var plant_id := plant.id
+		vbox.gui_input.connect(_on_flower_widget_input.bind(plant_id))
+
 		flower_container.add_child(vbox)
 
 		# idle 动画器
@@ -125,6 +139,22 @@ func _on_garden_btn_pressed() -> void:
 func _on_breeding_room_btn_pressed() -> void:
 	SFXPlayer.play_click()
 	get_tree().change_scene_to_file("res://scenes/breeding_room.tscn")
+
+
+func _on_encyclopedia_btn_pressed() -> void:
+	SFXPlayer.play_click()
+	encyclopedia.popup()
+
+
+func _on_clear_vase_pressed() -> void:
+	SFXPlayer.play_click()
+	GameState.clear_vase()
+
+
+func _on_flower_widget_input(event: InputEvent, plant_id: String) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		GameState.remove_vase_flower(plant_id)
+		get_viewport().set_input_as_handled()
 
 
 func _on_desktop_changed() -> void:

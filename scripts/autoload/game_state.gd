@@ -80,6 +80,10 @@ func water_plant(plot_index: int) -> bool:
 func remove_plant(plot_index: int) -> void:
 	if plot_index < 0 or plot_index >= garden_plots.size():
 		return
+	var p: Plant = garden_plots[plot_index]
+	if p != null and p.id in vase_flower_ids:
+		vase_flower_ids.erase(p.id)
+		EventBus.desktop_changed.emit()
 	garden_plots[plot_index] = null
 	EventBus.plant_removed.emit(plot_index)
 	EventBus.garden_changed.emit()
@@ -115,6 +119,13 @@ func breed_plants(plot_a: int, plot_b: int, target_plot: int) -> Plant:
 	child.is_rare = result.is_rare
 	child.rare_type = result.rare_type
 	child.setup_breeding_sprout(result.color)
+
+	# 加入种子库以便存档后可重新种植
+	if not result.plant_type in seed_inventory:
+		seed_inventory.append(result.plant_type)
+
+	# 检查新发现
+	_check_discovery_for_type(result.plant_type, result.is_rare)
 
 	garden_plots[target_plot] = child
 	EventBus.breeding_started.emit(target_plot, plot_a, plot_b)
@@ -152,20 +163,18 @@ func clear_vase() -> void:
 
 ## 获取花瓶中所有植物
 func get_vase_plants() -> Array:
+	# 构建ID→Plant查找表，避免O(n²)遍历
+	var lookup: Dictionary = {}
+	for p in garden_plots:
+		if p != null:
+			lookup[p.id] = p
+	for p in flower_storage:
+		if p != null:
+			lookup[p.id] = p
 	var result: Array = []
 	for fid in vase_flower_ids:
-		var found: Plant = null
-		for p in garden_plots:
-			if p != null and p.id == fid:
-				found = p
-				break
-		if found == null:
-			for p in flower_storage:
-				if p != null and p.id == fid:
-					found = p
-					break
-		if found != null:
-			result.append(found)
+		if lookup.has(fid):
+			result.append(lookup[fid])
 	return result
 
 
@@ -268,16 +277,36 @@ func _check_discovery(plant: Plant) -> void:
 	_check_garden_expansion()
 
 
+## 检查新发现（按品种名和稀有度）
+func _check_discovery_for_type(type: String, is_rare: bool) -> void:
+	if encyclopedia.has(type):
+		return
+	encyclopedia[type] = true
+	EventBus.flower_discovered.emit(type)
+
+	if is_rare:
+		EventBus.rare_flower_found.emit(type)
+
+	# 加入种子库
+	if not type in seed_inventory:
+		seed_inventory.append(type)
+
+	# 检查花圃扩展
+	_check_garden_expansion()
+
+
 func _check_garden_expansion() -> void:
 	var collected := encyclopedia.size()
 	# 首次: 6格时需5个发现 → 扩展到9格
 	# 二次: 9格时需10个发现 → 扩展到12格
 	# 三次: 12格时需15个发现 → 扩展到15格
-	# 上限: 15格（MAX=20但实际到15格）
-	var threshold := ((garden_size - 6) / EXPAND_AMOUNT) * EXPAND_TRIGGER
+	var threshold := ((garden_size - 6) / EXPAND_AMOUNT + 1) * EXPAND_TRIGGER
 	if collected >= threshold and garden_size < MAX_GARDEN_SIZE:
 		garden_size = mini(garden_size + EXPAND_AMOUNT, MAX_GARDEN_SIZE)
 		garden_plots.resize(garden_size)
+		# 首次扩展赠送多肉种子
+		if garden_size == 9 and not "succulent_echeveria" in seed_inventory:
+			seed_inventory.append("succulent_echeveria")
 		EventBus.garden_expanded.emit(garden_size)
 
 
@@ -314,14 +343,23 @@ func from_dictionary(data: Dictionary) -> void:
 			garden_plots.append(null)
 	while garden_plots.size() < garden_size:
 		garden_plots.append(null)
-	vase_flower_ids.clear()
-	for fid in data.get("vase_flower_ids", []):
-		vase_flower_ids.append(fid)
-	seed_inventory.clear()
-	for s in data.get("seed_inventory", ["rose_red", "daisy_white", "tulip_yellow"]):
-		seed_inventory.append(s)
 	encyclopedia = data.get("encyclopedia", {})
 	flower_storage.clear()
 	for entry in data.get("flower_storage", []):
 		if entry != null and entry is Dictionary:
 			flower_storage.append(Plant.from_dictionary(entry))
+	# 验证花瓶ID有效性：构建所有现存植物ID集合
+	var valid_ids: Dictionary = {}
+	for p in garden_plots:
+		if p != null:
+			valid_ids[p.id] = true
+	for p in flower_storage:
+		if p != null:
+			valid_ids[p.id] = true
+	vase_flower_ids.clear()
+	for fid in data.get("vase_flower_ids", []):
+		if valid_ids.has(fid):
+			vase_flower_ids.append(fid)
+	seed_inventory.clear()
+	for s in data.get("seed_inventory", ["rose_red", "daisy_white", "tulip_yellow"]):
+		seed_inventory.append(s)

@@ -4,6 +4,7 @@ extends Control
 const FLOWER_PICKER_SCENE := preload("res://scenes/ui/flower_picker.tscn")
 
 @onready var back_btn: Button = $Background/Margin/VBox/TopBar/BackButton
+@onready var desktop_btn: Button = $Background/Margin/VBox/TopBar/DesktopButton
 @onready var storage_count: Label = $Background/Margin/VBox/TopBar/StorageCount
 @onready var parent_a_slot: PanelContainer = $Background/Margin/VBox/BreedArea/ParentA
 @onready var parent_a_icon: Label = $Background/Margin/VBox/BreedArea/ParentA/VBox/Icon
@@ -27,6 +28,7 @@ var flower_picker: Control = null
 
 func _ready() -> void:
 	back_btn.pressed.connect(_on_back_pressed)
+	desktop_btn.pressed.connect(_on_desktop_pressed)
 	parent_a_btn.pressed.connect(_on_pick_parent_a)
 	parent_b_btn.pressed.connect(_on_pick_parent_b)
 	breed_btn.pressed.connect(_on_breed_pressed)
@@ -85,6 +87,12 @@ func _update_breed_button() -> void:
 
 
 func _on_pick_parent_a() -> void:
+	# Toggle: 如果已选择，再次点击则取消选择
+	if _parent_a_index >= 0:
+		_parent_a_index = -1
+		result_label.text = ""
+		_update_display()
+		return
 	_picking_for = "a"
 	var disabled: Array[int] = []
 	if _parent_b_index >= 0:
@@ -93,6 +101,12 @@ func _on_pick_parent_a() -> void:
 
 
 func _on_pick_parent_b() -> void:
+	# Toggle: 如果已选择，再次点击则取消选择
+	if _parent_b_index >= 0:
+		_parent_b_index = -1
+		result_label.text = ""
+		_update_display()
+		return
 	_picking_for = "b"
 	var disabled: Array[int] = []
 	if _parent_a_index >= 0:
@@ -141,6 +155,15 @@ func _on_breed_pressed() -> void:
 	msg += "（已加入种子库）"
 	result_label.text = msg
 
+	# 延迟后重置父本选择，方便继续培育
+	get_tree().create_timer(2.0).timeout.connect(_reset_breeding_state)
+
+
+func _reset_breeding_state() -> void:
+	_parent_a_index = -1
+	_parent_b_index = -1
+	_update_display()
+
 
 func _on_breeding_done(_plant_type: String, _is_rare: bool, _is_new: bool) -> void:
 	_update_display()
@@ -149,3 +172,8 @@ func _on_breeding_done(_plant_type: String, _is_rare: bool, _is_new: bool) -> vo
 func _on_back_pressed() -> void:
 	SFXPlayer.play_click()
 	get_tree().change_scene_to_file("res://scenes/garden.tscn")
+
+
+func _on_desktop_pressed() -> void:
+	SFXPlayer.play_click()
+	get_tree().change_scene_to_file("res://scenes/desktop.tscn")

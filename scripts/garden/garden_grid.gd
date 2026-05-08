@@ -113,15 +113,18 @@ func _input(event: InputEvent) -> void:
 	if any_menu_open:
 		return
 
-	# 右键移除植物
+	# 右键移除植物：幼苗及以上显示操作菜单，种子/嫩芽直接移除
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		var clicked_plot := _get_plot_at_position(event.global_position)
 		if clicked_plot >= 0:
 			var plant: Plant = GameState.get_plant(clicked_plot)
 			if plant != null:
-				GameState.remove_plant(clicked_plot)
-				_refresh_plot(clicked_plot)
-				_update_info()
+				if plant.stage >= Plant.Stage.SEEDLING:
+					flower_action_menu.popup(clicked_plot, plant.display_name)
+				else:
+					GameState.remove_plant(clicked_plot)
+					_refresh_plot(clicked_plot)
+					_update_info()
 		get_viewport().set_input_as_handled()
 
 	# ESC关闭（无操作，仅拦截）

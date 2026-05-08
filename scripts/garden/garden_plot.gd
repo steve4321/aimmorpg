@@ -7,6 +7,7 @@ signal plot_clicked(plot_index: int)
 
 var _current_plant: Plant = null
 var _highlighted: bool = false
+var _hovered: bool = false
 
 @onready var plant_icon: Label = $VBox/PlantIcon
 @onready var stage_label: Label = $VBox/StageLabel
@@ -18,6 +19,8 @@ var _highlighted: bool = false
 
 func _ready() -> void:
 	gui_input.connect(_on_gui_input)
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 
 
 func setup(index: int) -> void:
@@ -62,6 +65,8 @@ func _update_display() -> void:
 		style.set_corner_radius_all(8)
 		style.border_color = Color(0.45, 0.35, 0.25)
 		style.set_border_width_all(3)
+		if _hovered:
+			style.border_color = Color(0.6, 0.5, 0.4)
 		add_theme_stylebox_override("panel", style)
 		return
 
@@ -105,6 +110,12 @@ func _update_display() -> void:
 	if _highlighted:
 		style.border_color = Color(1.0, 0.85, 0.2)
 		style.set_border_width_all(4)
+	elif _hovered:
+		# 悬停时：边框稍亮
+		if _current_plant.stage == Plant.Stage.FLOWERING:
+			style.border_color = Color(0.5, 0.7, 0.4)
+		else:
+			style.border_color = Color(0.55, 0.45, 0.35)
 	add_theme_stylebox_override("panel", style)
 
 
@@ -112,3 +123,13 @@ func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			plot_clicked.emit(plot_index)
+
+
+func _on_mouse_entered() -> void:
+	_hovered = true
+	_update_display()
+
+
+func _on_mouse_exited() -> void:
+	_hovered = false
+	_update_display()
