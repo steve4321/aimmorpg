@@ -37,7 +37,15 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 # ============================================================
 # API 配置
 # ============================================================
-API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+MODELS = [
+    "black-forest-labs/FLUX.1-schnell",
+    "stabilityai/stable-diffusion-2-1",
+    "runwayml/stable-diffusion-v1-5",
+]
+API_BASES = [
+    "https://router.huggingface.co/hf-inference/models",
+    "https://api-inference.huggingface.co/models",
+]
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
 
 # ============================================================
@@ -1054,7 +1062,7 @@ def _auto_stage_description(
 # ============================================================
 
 def call_hf_api(prompt: str, max_retries: int = 5) -> bytes | None:
-    """调用 HuggingFace Inference API 生成图片，返回 PNG 字节"""
+    """调用 HuggingFace Inference API 生成图片，自动尝试多个模型和端点"""
     import requests
 
     headers = {}
@@ -1062,45 +1070,45 @@ def call_hf_api(prompt: str, max_retries: int = 5) -> bytes | None:
         headers["Authorization"] = f"Bearer {HF_TOKEN}"
     payload = {"inputs": prompt}
 
-    for attempt in range(max_retries):
-        try:
-            response = requests.post(API_URL, headers=headers, json=payload, timeout=120)
+    for base in API_BASES:
+        for model in MODELS:
+            url = f"{base}/{model}"
+            for attempt in range(3):
+                try:
+                    response = requests.post(url, headers=headers, json=payload, timeout=120)
 
-            if response.status_code == 200:
-                return response.content
+                    if response.status_code == 200:
+                        return response.content
 
-            elif response.status_code == 503:
-                # 模型加载中，等待后重试
-                wait_time = 30 * (attempt + 1)
-                print(f"    模型加载中，等待 {wait_time}s... (尝试 {attempt + 1}/{max_retries})")
-                time.sleep(wait_time)
+                    elif response.status_code == 503:
+                        wait_time = 30 * (attempt + 1)
+                        print(f"    模型加载中，等待 {wait_time}s...")
+                        time.sleep(wait_time)
 
-            elif response.status_code == 429:
-                # 速率限制，等待后重试
-                wait_time = 60 * (attempt + 1)
-                print(f"    速率限制，等待 {wait_time}s... (尝试 {attempt + 1}/{max_retries})")
-                time.sleep(wait_time)
+                    elif response.status_code == 429:
+                        wait_time = 60 * (attempt + 1)
+                        print(f"    速率限制，等待 {wait_time}s...")
+                        time.sleep(wait_time)
 
-            elif response.status_code == 401:
-                print("警告：匿名调用受限，建议设置 HF_TOKEN 获得更稳定的访问")
-                print("获取免费 token: https://huggingface.co/settings/tokens")
-                if attempt < max_retries - 1:
-                    time.sleep(30)
-                else:
-                    return None
+                    elif response.status_code == 401:
+                        print("    匿名受限，建议设置 HF_TOKEN")
+                        time.sleep(30)
 
-            else:
-                print(f"    API 错误 {response.status_code}: {response.text[:200]}")
-                if attempt < max_retries - 1:
-                    time.sleep(10)
+                    elif response.status_code == 404:
+                        print(f"    {model} 在此端点不可用，尝试下一个...")
+                        break
 
-        except requests.exceptions.Timeout:
-            print(f"    请求超时，重试中... (尝试 {attempt + 1}/{max_retries})")
-        except requests.exceptions.ConnectionError:
-            print(f"    连接错误，等待后重试... (尝试 {attempt + 1}/{max_retries})")
-            time.sleep(15)
+                    else:
+                        print(f"    API {response.status_code}: {response.text[:100]}")
+                        time.sleep(10)
 
-    print(f"    跳过（重试 {max_retries} 次后失败）")
+                except requests.exceptions.Timeout:
+                    print(f"    超时，重试...")
+                except requests.exceptions.ConnectionError:
+                    print(f"    连接失败")
+                    break
+
+    print("    所有模型/端点均失败")
     return None
 
 
