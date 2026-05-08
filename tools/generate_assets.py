@@ -1057,7 +1057,9 @@ def call_hf_api(prompt: str, max_retries: int = 5) -> bytes | None:
     """调用 HuggingFace Inference API 生成图片，返回 PNG 字节"""
     import requests
 
-    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+    headers = {}
+    if HF_TOKEN:
+        headers["Authorization"] = f"Bearer {HF_TOKEN}"
     payload = {"inputs": prompt}
 
     for attempt in range(max_retries):
@@ -1080,8 +1082,12 @@ def call_hf_api(prompt: str, max_retries: int = 5) -> bytes | None:
                 time.sleep(wait_time)
 
             elif response.status_code == 401:
-                print("错误：HF_TOKEN 无效或未设置。请运行: export HF_TOKEN='hf_xxxxxxxx'")
-                sys.exit(1)
+                print("警告：匿名调用受限，建议设置 HF_TOKEN 获得更稳定的访问")
+                print("获取免费 token: https://huggingface.co/settings/tokens")
+                if attempt < max_retries - 1:
+                    time.sleep(30)
+                else:
+                    return None
 
             else:
                 print(f"    API 错误 {response.status_code}: {response.text[:200]}")
@@ -1779,15 +1785,11 @@ def main():
         print_stats()
         return
 
-    # 检查 HF_TOKEN
+    # 检查 HF_TOKEN（可选，匿名也能调用免费模型）
     if not HF_TOKEN:
-        print("警告: 未设置 HF_TOKEN 环境变量")
-        print("请运行: export HF_TOKEN='hf_xxxxxxxx'")
-        print("获取免费 token: https://huggingface.co/settings/tokens")
+        print("提示: 未设置 HF_TOKEN，将匿名调用免费模型（速率受限）")
+        print("设置 token 可获得更稳定的访问: https://huggingface.co/settings/tokens")
         print()
-        print("或者使用 --no-api 模式生成程序化占位图")
-        print("  python generate_assets.py --no-api")
-        sys.exit(1)
 
     # 检查依赖
     try:
