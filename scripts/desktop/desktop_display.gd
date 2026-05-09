@@ -92,12 +92,18 @@ func _build_warehouse_list() -> void:
 
 
 func _make_warehouse_item(plant: Plant, storage_index: int) -> Control:
+	var in_vase: bool = plant.id in GameState.vase_flower_ids
+
 	var item := PanelContainer.new()
 	item.custom_minimum_size = Vector2(0, 56)
 	item.set_meta("storage_index", storage_index)
+	item.set_meta("in_vase", in_vase)
 
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1, 1, 1, 0.06)
+	if in_vase:
+		style.bg_color = Color(0.3, 0.3, 0.3, 0.2)
+	else:
+		style.bg_color = Color(1, 1, 1, 0.06)
 	style.set_corner_radius_all(6)
 	item.add_theme_stylebox_override("panel", style)
 
@@ -107,6 +113,8 @@ func _make_warehouse_item(plant: Plant, storage_index: int) -> Control:
 	var icon := Label.new()
 	icon.text = "🌸"
 	icon.modulate = plant.get_display_color()
+	if in_vase:
+		icon.modulate = Color(0.5, 0.5, 0.5)
 	icon.add_theme_font_size_override("font_size", 24)
 	icon.custom_minimum_size = Vector2(40, 0)
 	hbox.add_child(icon)
@@ -118,15 +126,23 @@ func _make_warehouse_item(plant: Plant, storage_index: int) -> Control:
 	var name_lbl := Label.new()
 	name_lbl.text = plant.display_name
 	name_lbl.add_theme_font_size_override("font_size", 12)
+	if in_vase:
+		name_lbl.modulate = Color(0.5, 0.5, 0.5)
 	vbox.add_child(name_lbl)
 
 	var type_lbl := Label.new()
-	type_lbl.text = plant.plant_type
+	if in_vase:
+		type_lbl.text = "已在花瓶中"
+		type_lbl.modulate = Color(0.6, 0.6, 0.6)
+	else:
+		type_lbl.text = plant.plant_type
+		type_lbl.modulate = Color(0.6, 0.6, 0.6)
 	type_lbl.add_theme_font_size_override("font_size", 10)
-	type_lbl.modulate = Color(0.6, 0.6, 0.6)
 	vbox.add_child(type_lbl)
 
-	item.gui_input.connect(_on_warehouse_item_input.bind(storage_index))
+	# 已使用的不能拖拽
+	if not in_vase:
+		item.gui_input.connect(_on_warehouse_item_input.bind(storage_index))
 	return item
 
 
@@ -186,6 +202,7 @@ func _finish_warehouse_drag() -> void:
 		var result: bool = GameState.arrange_flower(_drag_from_storage_index, local_pos)
 		if result:
 			_refresh_vase()
+			_build_warehouse_list()
 			EventBus.emit_signal("desktop_changed")
 	_drag_from_storage_index = -1
 
@@ -319,6 +336,7 @@ func _on_flower_input(event: InputEvent, flower_id: String) -> void:
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		GameState.remove_vase_flower(flower_id)
 		_refresh_vase()
+		_build_warehouse_list()
 
 
 func _get_widget(flower_id: String) -> Control:
@@ -339,6 +357,8 @@ func _on_storage_changed(_plot_index: int) -> void:
 
 func _on_desktop_changed() -> void:
 	_refresh_vase()
+	if warehouse_panel.visible:
+		_build_warehouse_list()
 
 
 func _on_game_loaded() -> void:
@@ -364,3 +384,4 @@ func _on_clear_vase_pressed() -> void:
 	SFXPlayer.play_click()
 	GameState.clear_vase()
 	_refresh_vase()
+	_build_warehouse_list()
