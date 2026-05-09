@@ -7,6 +7,8 @@ var garden_size: int = 6
 
 ## 桌面花瓶：插花的花 plant_id 列表（可多朵）
 var vase_flower_ids: Array = []
+## 花瓶中每朵花的位置（id -> {x, y}）
+var vase_flower_positions: Dictionary = {}
 
 ## 花仓库：收藏的已开花植物（Array of Plant）
 var flower_storage: Array = []
@@ -135,29 +137,40 @@ func breed_plants(plot_a: int, plot_b: int, target_plot: int) -> Plant:
 
 ## === 桌面花瓶 ===
 
-## 插花到桌面花瓶（从花圃选，不消耗）
-func arrange_flower(plot_index: int) -> bool:
-	var p := get_plant(plot_index)
-	if p == null:
+## 插花到桌面花瓶（从仓库选，可指定位置）
+func arrange_flower(storage_index: int, pos: Vector2 = Vector2(-1, -1)) -> bool:
+	if storage_index < 0 or storage_index >= flower_storage.size():
 		return false
-	if p.stage != Plant.Stage.FLOWERING:
-		return false
+	var p: Plant = flower_storage[storage_index]
 	if p.id in vase_flower_ids:
 		return false
+	if vase_flower_ids.size() >= 10:
+		return false
 	vase_flower_ids.append(p.id)
+	vase_flower_positions[p.id] = {"x": pos.x, "y": pos.y}
 	EventBus.desktop_changed.emit()
 	return true
+
+
+## 移动花瓶中花朵的位置
+func set_vase_flower_position(flower_id: String, pos: Vector2) -> void:
+	if not flower_id in vase_flower_ids:
+		return
+	vase_flower_positions[flower_id] = {"x": pos.x, "y": pos.y}
+	EventBus.desktop_changed.emit()
 
 
 ## 从花瓶移除一朵花
 func remove_vase_flower(flower_id: String) -> void:
 	vase_flower_ids.erase(flower_id)
+	vase_flower_positions.erase(flower_id)
 	EventBus.desktop_changed.emit()
 
 
 ## 清空花瓶
 func clear_vase() -> void:
 	vase_flower_ids.clear()
+	vase_flower_positions.clear()
 	EventBus.desktop_changed.emit()
 
 
@@ -176,6 +189,11 @@ func get_vase_plants() -> Array:
 		if lookup.has(fid):
 			result.append(lookup[fid])
 	return result
+
+
+## 获取花瓶花朵位置
+func get_vase_flower_positions() -> Dictionary:
+	return vase_flower_positions
 
 
 ## === 花仓库 ===
@@ -234,6 +252,62 @@ func breed_from_storage(storage_a: int, storage_b: int) -> Dictionary:
 		parent_a.color, parent_b.color)
 
 	# 结果直接加入种子库
+	var new_type: String = result.plant_type
+	if not new_type in seed_inventory:
+		seed_inventory.append(new_type)
+
+	# 检查新发现
+	var new_data: Dictionary = PlantData.get_data(new_type)
+	var is_new_discovery := not encyclopedia.has(new_type)
+	if is_new_discovery:
+		encyclopedia[new_type] = true
+		if result.is_rare:
+			EventBus.rare_flower_found.emit(new_type)
+		_check_garden_expansion()
+
+	EventBus.breeding_done.emit(new_type, result.is_rare, is_new_discovery)
+	return {
+		"plant_type": new_type,
+		"plant_name": new_data.get("name", "???"),
+		"is_rare": result.is_rare,
+		"rare_type": result.rare_type,
+		"color": result.color,
+		"is_new": is_new_discovery,
+	}
+
+
+## 多亲本培育（2-5朵仓库花，不消耗花朵）
+func breed_from_storage_multi(storage_indices: Array) -> Dictionary:
+	if storage_indices.size() < 2 or storage_indices.size() > 5:
+		return {}
+
+	# 验证索引并构建亲本数据
+	var parents_data: Array = []
+	for idx in storage_indices:
+		if idx < 0 or idx >= flower_storage.size():
+			return {}
+		var plant: Plant = flower_storage[idx]
+		if plant.stage != Plant.Stage.FLOWERING:
+			return {}
+		parents_data.append({
+			"plant_type": plant.plant_type,
+			"color": plant.color,
+		})
+
+	# 兼容性检查：花卉×多肉/仙人掌不可培育
+	for i in range(parents_data.size()):
+		for j in range(i + 1, parents_data.size()):
+			if not GeneSystem.can_breed_across_groups(
+				PlantData.get_group(parents_data[i].plant_type),
+				PlantData.get_group(parents_data[j].plant_type)):
+				return {"error": "incompatible"}
+
+	# 执行培育
+	var result: Dictionary = GeneSystem.breed_multi(parents_data)
+	if result.is_empty():
+		return {}
+
+	# 加入种子库
 	var new_type: String = result.plant_type
 	if not new_type in seed_inventory:
 		seed_inventory.append(new_type)
@@ -326,6 +400,7 @@ func to_dictionary() -> Dictionary:
 		"garden_size": garden_size,
 		"garden_plots": plots_data,
 		"vase_flower_ids": vase_flower_ids,
+		"vase_flower_positions": vase_flower_positions,
 		"seed_inventory": seed_inventory,
 		"encyclopedia": encyclopedia,
 		"flower_storage": storage_data,
@@ -360,6 +435,14 @@ func from_dictionary(data: Dictionary) -> void:
 	for fid in data.get("vase_flower_ids", []):
 		if valid_ids.has(fid):
 			vase_flower_ids.append(fid)
+	vase_flower_positions = data.get("vase_flower_positions", {})
+	# 清理无效位置
+	var invalid_keys: Array = []
+	for fid in vase_flower_positions.keys():
+		if not fid in valid_ids:
+			invalid_keys.append(fid)
+	for fid in invalid_keys:
+		vase_flower_positions.erase(fid)
 	seed_inventory.clear()
 	for s in data.get("seed_inventory", ["rose_red", "daisy_white", "tulip_yellow"]):
 		seed_inventory.append(s)

@@ -28,54 +28,122 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Center" type="CenterContainer" parent="VBox"]
+[node name="TopBar" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+
+[node name="Title" type="Label" parent="VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "🌸 桌面花瓶"
+horizontal_alignment = 1
+
+[node name="MainHBox" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VaseArea" type="PanelContainer" parent="VBox/Center"]
+[node name="WarehousePanel" type="PanelContainer" parent="VBox/MainHBox"]
 layout_mode = 2
-custom_minimum_size = Vector2(300, 220)
-
-[node name="VBox" type="VBoxContainer" parent="VBox/Center/VaseArea"]
-layout_mode = 2
-alignment = 1
-
-[node name="FlowerContainer" type="HFlowContainer" parent="VBox/Center/VaseArea/VBox"]
-layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 4
+custom_minimum_size = Vector2(160, 0)
 visible = false
 
-[node name="EmptyHint" type="Label" parent="VBox/Center/VaseArea/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "💐 点击插花"
-horizontal_alignment = 1
+[node name="WarehouseVBox" type="VBoxContainer" parent="VBox/MainHBox/WarehousePanel"]
+layout_mode = 1
 
-[node name="Bar" type="HBoxContainer" parent="VBox"]
+[node name="WarehouseTitle" type="Label" parent="VBox/MainHBox/WarehousePanel/WarehouseVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 36)
+theme_override_font_sizes/font_size = 14
+text = "📦 仓库鲜花（拖入花瓶）"
+
+[node name="WarehouseScroll" type="ScrollContainer" parent="VBox/MainHBox/WarehousePanel/WarehouseVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="WarehouseList" type="VBoxContainer" parent="VBox/MainHBox/WarehousePanel/WarehouseVBox/WarehouseScroll"]
+layout_mode = 1
+custom_minimum_size = Vector2(150, 0)
+
+[node name="WarehouseHint" type="Label" parent="VBox/MainHBox/WarehousePanel/WarehouseVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "（仓库暂无鲜花）"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VasePanel" type="PanelContainer" parent="VBox/MainHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="VaseArea" type="PanelContainer" parent="VBox/MainHBox/VasePanel"]
+layout_mode = 1
+custom_minimum_size = Vector2(400, 360)
+alignment = 1
+
+[node name="VaseContent" type="Control" parent="VBox/MainHBox/VasePanel/VaseArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AddBtn" type="Button" parent="VBox/MainHBox/VasePanel/VaseArea/VaseContent"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -44.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = 36.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "➕"
+
+[node name="EmptyHint" type="Label" parent="VBox/MainHBox/VasePanel/VaseArea/VaseContent"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "💐 右上角➕添加"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomBar" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
 alignment = 1
 
-[node name="GardenButton" type="Button" parent="VBox/Bar"]
+[node name="Spacer" type="Control" parent="VBox/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GardenButton" type="Button" parent="VBox/BottomBar"]
 layout_mode = 2
 custom_minimum_size = Vector2(80, 40)
 theme_override_font_sizes/font_size = 14
 text = "🌿 花圃"
 
-[node name="EncyclopediaButton" type="Button" parent="VBox/Bar"]
-layout_mode = 2
-custom_minimum_size = Vector2(80, 40)
-theme_override_font_sizes/font_size = 14
-text = "📖 图鉴"
-
-[node name="BreedingRoomButton" type="Button" parent="VBox/Bar"]
+[node name="BreedingRoomButton" type="Button" parent="VBox/BottomBar"]
 layout_mode = 2
 custom_minimum_size = Vector2(80, 40)
 theme_override_font_sizes/font_size = 14
 text = "🌱 培育室"
 
-[node name="ClearVaseButton" type="Button" parent="VBox/Bar"]
+[node name="ClearVaseButton" type="Button" parent="VBox/BottomBar"]
 layout_mode = 2
 custom_minimum_size = Vector2(80, 40)
 theme_override_font_sizes/font_size = 14
-text = "🗑 清空花瓶"
+text = "🗑 清空"
+
+[node name="Spacer2" type="Control" parent="VBox/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3

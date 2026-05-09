@@ -26,7 +26,7 @@ SFXPlayer="*res://scripts/autoload/sfx_player.gd"
 [display]
 
 window/size/viewport_width=640
-window/size/viewport_height=480
+window/size/viewport_height=640
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 

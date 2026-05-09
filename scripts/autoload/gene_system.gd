@@ -68,6 +68,69 @@ static func breed(parent_a_type: String, parent_b_type: String,
 	}
 
 
+## 多亲本培育（2-5朵花）
+static func breed_multi(parents: Array) -> Dictionary:
+	if parents.size() < 2:
+		return {}
+	var first_group: int = PlantData.get_group(parents[0].plant_type)
+
+	# 1. 稀有变异：亲本越多概率越高
+	var rare_chance: float = RARE_BASE_CHANCE * parents.size() * 0.8
+	if randf() < rare_chance:
+		var mixed := _mix_multi_colors(parents)
+		var rare_type := check_rare(mixed, first_group)
+		if rare_type != "":
+			var rare_plant_type := _rare_type_to_plant(rare_type)
+			if rare_plant_type != "":
+				return {
+					"plant_type": rare_plant_type,
+					"color": PlantData.get_data(rare_plant_type).get("base_color", mixed),
+					"is_rare": true,
+					"rare_type": rare_type,
+				}
+
+	# 2. 同组杂交（27%/对，检查相邻亲本对）
+	for i in range(parents.size() - 1):
+		if randf() < CROSS_BREED_CHANCE:
+			var cross_result := PlantData.lookup_cross_breed(parents[i].plant_type, parents[i + 1].plant_type)
+			if cross_result != "":
+				var mixed := _mix_multi_colors(parents)
+				return {
+					"plant_type": cross_result,
+					"color": mixed,
+					"is_rare": false,
+					"rare_type": "",
+				}
+
+	# 3. 多亲本混色
+	var mixed := _mix_multi_colors(parents)
+	return {
+		"plant_type": parents[0].plant_type,
+		"color": mixed,
+		"is_rare": false,
+		"rare_type": "",
+	}
+
+
+## 多亲本颜色混合（加权随机平均）
+static func _mix_multi_colors(parents: Array) -> Dictionary:
+	var total_r: float = 0.0
+	var total_g: float = 0.0
+	var total_b: float = 0.0
+	var total_weight: float = 0.0
+	for p in parents:
+		var w: float = randf_range(0.5, 1.5)
+		total_r += p.color.r * w
+		total_g += p.color.g * w
+		total_b += p.color.b * w
+		total_weight += w
+	return {
+		"r": clampi(int(total_r / total_weight + randf_range(-MIX_COLOR_OFFSET, MIX_COLOR_OFFSET)), 0, 255),
+		"g": clampi(int(total_g / total_weight + randf_range(-MIX_COLOR_OFFSET, MIX_COLOR_OFFSET)), 0, 255),
+		"b": clampi(int(total_b / total_weight + randf_range(-MIX_COLOR_OFFSET, MIX_COLOR_OFFSET)), 0, 255),
+	}
+
+
 ## 检查颜色是否触发稀有花
 static func check_rare(color: Dictionary, group: int) -> String:
 	# 黑玫瑰：蔷薇系，极暗

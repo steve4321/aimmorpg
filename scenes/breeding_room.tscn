@@ -32,125 +32,104 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBox" type="VBoxContainer" parent="Background/Margin"]
+[node name="MainVBox" type="VBoxContainer" parent="Background/Margin"]
 layout_mode = 2
+theme_override_constants/separation = 8
 
-[node name="TopBar" type="HBoxContainer" parent="Background/Margin/VBox"]
-layout_mode = 2
-
-[node name="BackButton" type="Button" parent="Background/Margin/VBox/TopBar"]
-layout_mode = 2
-custom_minimum_size = Vector2(80, 36)
-text = "🌿 花圃"
-
-[node name="DesktopButton" type="Button" parent="Background/Margin/VBox/TopBar"]
-layout_mode = 2
-custom_minimum_size = Vector2(80, 36)
-text = "🖥 桌面"
-
-[node name="Title" type="Label" parent="Background/Margin/VBox/TopBar"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-size_flags_horizontal = 3
-text = "🌱 培育室"
-horizontal_alignment = 1
-
-[node name="StorageCount" type="Label" parent="Background/Margin/VBox/TopBar"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "仓库: 0朵花"
-
-[node name="BreedArea" type="HBoxContainer" parent="Background/Margin/VBox"]
+[node name="ContentHBox" type="HBoxContainer" parent="Background/Margin/MainVBox"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="ParentA" type="PanelContainer" parent="Background/Margin/VBox/BreedArea"]
+[node name="LeftPanel" type="PanelContainer" parent="Background/Margin/MainVBox/ContentHBox"]
 layout_mode = 2
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 200)
+custom_minimum_size = Vector2(200, 0)
+size_flags_vertical = 3
 
-[node name="VBox" type="VBoxContainer" parent="Background/Margin/VBox/BreedArea/ParentA"]
+[node name="LeftVBox" type="VBoxContainer" parent="Background/Margin/MainVBox/ContentHBox/LeftPanel"]
 layout_mode = 2
-alignment = 1
 
-[node name="Icon" type="Label" parent="Background/Margin/VBox/BreedArea/ParentA/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "❓"
-horizontal_alignment = 1
-
-[node name="NameLabel" type="Label" parent="Background/Margin/VBox/BreedArea/ParentA/VBox"]
+[node name="WarehouseTitle" type="Label" parent="Background/Margin/MainVBox/ContentHBox/LeftPanel/LeftVBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "未选择"
+text = "📦 仓库"
 horizontal_alignment = 1
 
-[node name="GroupLabel" type="Label" parent="Background/Margin/VBox/BreedArea/ParentA/VBox"]
+[node name="WarehouseScroll" type="ScrollContainer" parent="Background/Margin/MainVBox/ContentHBox/LeftPanel/LeftVBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = ""
-horizontal_alignment = 1
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="SelectBtn" type="Button" parent="Background/Margin/VBox/BreedArea/ParentA/VBox"]
+[node name="WarehouseList" type="VBoxContainer" parent="Background/Margin/MainVBox/ContentHBox/LeftPanel/LeftVBox/WarehouseScroll"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 32)
-text = "选择花朵"
+size_flags_horizontal = 3
 
-[node name="BreedButton" type="Button" parent="Background/Margin/VBox/BreedArea"]
+[node name="RightPanel" type="VBoxContainer" parent="Background/Margin/MainVBox/ContentHBox"]
 layout_mode = 2
-custom_minimum_size = Vector2(100, 0)
-disabled = true
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Title" type="Label" parent="Background/Margin/MainVBox/ContentHBox/RightPanel"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "🌱
-培育"
+text = "🌱 培育室"
+horizontal_alignment = 1
 
-[node name="ParentB" type="PanelContainer" parent="Background/Margin/VBox/BreedArea"]
+[node name="SlotsContainer" type="HFlowContainer" parent="Background/Margin/MainVBox/ContentHBox/RightPanel"]
 layout_mode = 2
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 200)
-
-[node name="VBox" type="VBoxContainer" parent="Background/Margin/VBox/BreedArea/ParentB"]
-layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 alignment = 1
 
-[node name="Icon" type="Label" parent="Background/Margin/VBox/BreedArea/ParentB/VBox"]
+[node name="SlotCount" type="Label" parent="Background/Margin/MainVBox/ContentHBox/RightPanel"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "❓"
+theme_override_font_sizes/font_size = 14
+text = "已选 0/5"
 horizontal_alignment = 1
 
-[node name="NameLabel" type="Label" parent="Background/Margin/VBox/BreedArea/ParentB/VBox"]
+[node name="BreedButton" type="Button" parent="Background/Margin/MainVBox/ContentHBox/RightPanel"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "未选择"
-horizontal_alignment = 1
+custom_minimum_size = Vector2(0, 40)
+disabled = true
+theme_override_font_sizes/font_size = 18
+text = "🌱 培育"
 
-[node name="GroupLabel" type="Label" parent="Background/Margin/VBox/BreedArea/ParentB/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = ""
-horizontal_alignment = 1
-
-[node name="SelectBtn" type="Button" parent="Background/Margin/VBox/BreedArea/ParentB/VBox"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 32)
-text = "选择花朵"
-
-[node name="ResultArea" type="PanelContainer" parent="Background/Margin/VBox"]
+[node name="ResultArea" type="PanelContainer" parent="Background/Margin/MainVBox/ContentHBox/RightPanel"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 60)
 
-[node name="ResultLabel" type="Label" parent="Background/Margin/VBox/ResultArea"]
+[node name="ResultLabel" type="Label" parent="Background/Margin/MainVBox/ContentHBox/RightPanel/ResultArea"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "选择两朵花开始培育"
+theme_override_font_sizes/font_size = 15
+text = "从仓库拖入2-5朵花开始培育"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="HintLabel" type="Label" parent="Background/Margin/VBox"]
+[node name="HintLabel" type="Label" parent="Background/Margin/MainVBox/ContentHBox/RightPanel"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
-text = "💡 从仓库选两朵花，培育出新的种子！花不会被消耗"
+text = "💡 从仓库拖入花朵培育，花不会被消耗"
 horizontal_alignment = 1
+
+[node name="BottomBar" type="HBoxContainer" parent="Background/Margin/MainVBox"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Background/Margin/MainVBox/BottomBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 36)
+text = "🌿 花圃"
+
+[node name="DesktopButton" type="Button" parent="Background/Margin/MainVBox/BottomBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 36)
+text = "🖥 桌面"
+
+[node name="Spacer" type="Control" parent="Background/Margin/MainVBox/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StorageCount" type="Label" parent="Background/Margin/MainVBox/BottomBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "仓库: 0朵花"

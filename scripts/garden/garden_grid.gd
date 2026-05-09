@@ -3,7 +3,7 @@ extends Control
 
 const PLOT_SCENE := preload("res://scenes/ui/garden_plot.tscn")
 
-@onready var grid_container: GridContainer = $Background/Margin/VBox/GridContainer
+@onready var grid_container: GridContainer = $Background/Margin/VBox/ScrollContainer/GridContainer
 @onready var seed_menu: Control = $SeedMenu
 @onready var flower_action_menu: Control = $FlowerActionMenu
 @onready var encyclopedia: Control = $Encyclopedia
