@@ -254,12 +254,12 @@ func _refresh_vase() -> void:
 				pos = Vector2(50, 50)
 			_create_flower_widget(plant, fid, pos)
 
-		var style := StyleBoxFlat.new()
-		style.bg_color = Color(1, 1, 1, 0.10)
-		style.set_corner_radius_all(12)
-		style.set_border_width_all(1)
-		style.border_color = Color(1, 1, 1, 0.15)
-		vase_area.add_theme_stylebox_override("panel", style)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(1, 1, 1, 0.10)
+	style.set_corner_radius_all(12)
+	style.set_border_width_all(1)
+	style.border_color = Color(1, 1, 1, 0.15)
+	vase_area.add_theme_stylebox_override("panel", style)
 
 
 func _create_flower_widget(plant: Plant, flower_id: String, pos: Vector2) -> void:
