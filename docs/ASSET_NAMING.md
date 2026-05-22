@@ -23,56 +23,56 @@
 
 ```
 res://
-├── sprites/                          # 所有 2D 精灵资源
-│   ├── plants/                       # 植物精灵（动态着色白底）
-│   │   ├── flower/                   # 花卉（17种）
-│   │   │   ├── rose_red_0_seed.png
-│   │   │   ├── rose_red_1_sprout.png
-│   │   │   ├── rose_red_2_seedling.png
-│   │   │   ├── rose_red_3_mature.png
-│   │   │   ├── rose_red_4_flowering.png
+├── assets/
+│   ├── sprites/                     # 所有 2D 精灵资源
+│   │   ├── plants/                  # 植物精灵（动态着色白底）
+│   │   │   ├── flower/              # 花卉（17种）
+│   │   │   │   ├── rose_red_0_seed.png
+│   │   │   │   ├── rose_red_1_sprout.png
+│   │   │   │   ├── rose_red_2_seedling.png
+│   │   │   │   ├── rose_red_3_mature.png
+│   │   │   │   ├── rose_red_4_flowering.png
+│   │   │   │   ├── ...
+│   │   │   ├── succulent/           # 多肉（4种）
+│   │   │   │   ├── succulent_echeveria_0_seed.png
+│   │   │   │   ├── ...
+│   │   │   ├── cactus/              # 仙人掌（1种）
+│   │   │   │   ├── cactus_0_seed.png
+│   │   │   │   ├── ...
+│   │   │   └── rare/                # 稀有花（5种）
+│   │   │       ├── rare_rainbow_rose_0_seed.png
+│   │   │       ├── ...
+│   │   ├── ui/                      # UI 资源
+│   │   │   ├── icon_water.png
+│   │   │   ├── icon_collect.png
+│   │   │   ├── icon_breed.png
+│   │   │   ├── panel_breeding_room.png
 │   │   │   ├── ...
-│   │   ├── succulent/               # 多肉（4种）
-│   │   │   ├── succulent_echeveria_0_seed.png
-│   │   │   ├── ...
-│   │   ├── cactus/                  # 仙人掌（1种）
-│   │   │   ├── cactus_0_seed.png
-│   │   │   ├── ...
-│   │   └── rare/                    # 稀有花（5种）
-│   │       ├── rare_rainbow_rose_0_seed.png
-│   │       ├── ...
-│   ├── ui/                          # UI 资源
-│   │   ├── icon_water.png
-│   │   ├── icon_collect.png
-│   │   ├── icon_breed.png
-│   │   ├── panel_breeding_room.png
-│   │   ├── ...
-│   ├── background/                  # 场景背景
-│   │   ├── bg_garden.png
-│   │   ├── bg_desktop.png
-│   │   ├── bg_breeding_room.png
-│   │   └── ...
-│   └── effects/                     # 特效精灵（图集或散图）
-│       ├── water_drop.png           # 浇水水滴（序列帧）
-│       ├── bloom_reveal.png         # 开花揭晓（序列帧）
-│       ├── petal_falling.png        # 花瓣飘落（粒子图集）
-│       └── rare_sparkle.png         # 稀有花微光（粒子）
+│   │   ├── background/              # 场景背景
+│   │   │   ├── bg_garden.png
+│   │   │   ├── bg_desktop.png
+│   │   │   ├── bg_breeding_room.png
+│   │   │   └── ...
+│   │   └── effects/                 # 特效精灵（图集或散图）
+│   │       ├── water_drop.png       # 浇水水滴（序列帧）
+│   │       ├── bloom_reveal.png     # 开花揭晓（序列帧）
+│   │       ├── petal_falling.png    # 花瓣飘落（粒子图集）
+│   │       └── rare_sparkle.png     # 稀有花微光（粒子）
+│   └── audio/                        # 音频资源
+│       ├── sfx/                      # 音效（触发型）
+│       │   ├── sfx_click.wav
+│       │   ├── sfx_water.wav
+│       │   ├── sfx_grow.wav
+│       │   ├── sfx_discover.wav
+│       │   ├── sfx_breed_success.wav
+│       │   └── sfx_rare.wav
+│       └── bgm/                      # 背景音乐（循环型）
+│           ├── bgm_breeding.ogg
+│           └── bgm_garden.ogg        # 可选
 │
-├── audio/                           # 音频资源
-│   ├── sfx/                         # 音效（触发型）
-│   │   ├── sfx_click.wav
-│   │   ├── sfx_water.wav
-│   │   ├── sfx_grow.wav
-│   │   ├── sfx_discover.wav
-│   │   ├── sfx_breed_success.wav
-│   │   └── sfx_rare.wav
-│   └── bgm/                         # 背景音乐（循环型）
-│       ├── bgm_breeding.ogg
-│       └── bgm_garden.ogg           # 可选
-│
-└── fonts/                           # 字体资源
-    ├── NotoSansSC-Regular.ttf       # 界面中文
-    └── Nunito-Regular.ttf           # 英文/数字
+└── fonts/                            # 字体资源
+    ├── NotoSansSC-Regular.ttf        # 界面中文
+    └── Nunito-Regular.ttf            # 英文/数字
 ```
 
 ---
@@ -356,7 +356,7 @@ bgm_{scene}.{ext}
 extends Node
 
 ## 精灵根路径
-const SPRITE_ROOT := "res://sprites/plants/"
+const SPRITE_ROOT := "res://assets/sprites/plants/"
 
 ## 类别子目录
 const CATEGORY_DIR: Dictionary = {
@@ -403,7 +403,7 @@ func get_silhouette(plant_type: String) -> Texture2D:
     if _cache.has(key):
         return _cache[key]
 
-    var path := SPRITE_ROOT + "silhouette_" + plant_type + ".png"
+    var path := "res://assets/sprites/plants/silhouette_" + plant_type + ".png"
     if not ResourceLoader.exists(path):
         return null
 
@@ -424,7 +424,7 @@ func preload_all() -> void:
         var file_name := dir.get_file()
         while file_name != "":
             if file_name.ends_with(".png"):
-                var full_path := dir_path + file_name
+		var full_path := dir_path + "/" + file_name
                 _ = load(full_path)  # 预加载到缓存
             file_name = dir.get_file()
         dir.list_dir_end()

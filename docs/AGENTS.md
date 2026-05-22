@@ -14,7 +14,7 @@ Core loop: water plants to grow → store in warehouse → breed in breeding roo
 
 ```bash
 # Run the project (from project root)
-godot --headless            # Editor mode
+godot --editor              # Open Godot editor
 godot --headless --quit-after 60   # Run for 60 frames (testing)
 
 # Export for Linux
@@ -156,15 +156,21 @@ Prefer signals for:
 Use EventBus pattern to decouple systems:
 ```gdscript
 # EventBus.gd (autoload)
-signal plant_watered(plot_id: int)
-signal plant_bred(plot_id: int, parent_a_id: String, parent_b_id: String)
-signal stage_advanced(plot_id: int, new_stage: int)
+signal plant_watered(plot_index: int)
+signal plant_planted(plot_index: int, plant_type: String)
+signal plant_removed(plot_index: int)
+signal stage_advanced(plot_index: int, new_stage: int)
+signal breeding_started(plot_index: int, parent_a: int, parent_b: int)
+signal breeding_done(plant_type: String, is_rare: bool, is_new: bool)
+signal flower_stored(plot_index: int)
+signal flower_retrieved(plot_index: int)
 signal flower_discovered(plant_type: String)
 signal rare_flower_found(plant_type: String)
 signal garden_changed()
-signal flower_stored(plot_index: int)
-signal flower_retrieved(plot_index: int)
-signal breeding_done(plant_type: String, is_rare: bool, is_new: bool)
+signal garden_expanded(new_size: int)
+signal desktop_changed()
+signal game_saved()
+signal game_loaded()
 
 # broadcaster.gd
 EventBus.plant_watered.emit(plot_id)
@@ -207,9 +213,9 @@ enum Stage {SEED, SPROUT, SEEDLING, MATURE, FLOWERING}
 
 const STAGE_WATER_REQUIREMENTS: Dictionary = {
     Stage.SEED: 2,
-    Stage.SPROUT: 3,
+    Stage.SPROUT: 2,
     Stage.SEEDLING: 3,
-    Stage.MATURE: 4,
+    Stage.MATURE: 3,
     Stage.FLOWERING: 0  # No more watering needed
 }
 

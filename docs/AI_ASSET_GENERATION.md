@@ -309,7 +309,7 @@ silhouette_{plant_type}.png
 **验证步骤：**
 1. 生成 25 张精灵
 2. 按命名规则重命名：`{plant_type}_{stage}_{stage_name}.png`
-3. 放入 `res://sprites/plants/flower/` 等目录
+3. 放入 `res://assets/sprites/plants/flower/` 等目录
 4. 运行游戏测试显示效果
 5. 确认满意后批量生成其余 22 种
 
