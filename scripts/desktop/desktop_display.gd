@@ -203,7 +203,7 @@ func _finish_warehouse_drag() -> void:
 		if result:
 			_refresh_vase()
 			_build_warehouse_list()
-			EventBus.emit_signal("desktop_changed")
+			EventBus.desktop_changed.emit()
 	_drag_from_storage_index = -1
 
 
