@@ -91,8 +91,10 @@ func remove_plant(plot_index: int) -> void:
 	EventBus.garden_changed.emit()
 
 
-## 培育两株花
+## 培育两株花（旧版，已废弃 — 请使用 breed_from_storage / breed_from_storage_multi）
+## TODO: 待确认无外部引用后删除
 func breed_plants(plot_a: int, plot_b: int, target_plot: int) -> Plant:
+	push_warning("breed_plants is deprecated, use breed_from_storage instead")
 	var parent_a := get_plant(plot_a)
 	var parent_b := get_plant(plot_b)
 	if parent_a == null or parent_b == null:
@@ -122,11 +124,9 @@ func breed_plants(plot_a: int, plot_b: int, target_plot: int) -> Plant:
 	child.rare_type = result.rare_type
 	child.setup_breeding_sprout(result.color)
 
-	# 加入种子库以便存档后可重新种植
 	if not result.plant_type in seed_inventory:
 		seed_inventory.append(result.plant_type)
 
-	# 检查新发现
 	_check_discovery_for_type(result.plant_type, result.is_rare)
 
 	garden_plots[target_plot] = child
