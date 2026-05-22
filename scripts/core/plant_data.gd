@@ -719,7 +719,6 @@ static var CROSS_BREED_TABLE: Dictionary = {
 	# 蔷薇系内部
 	"rose+sakura": "peony",
 	"sakura+hibiscus": "begonia",
-	"sakura+sakura": "gardenia",
 	# 百合系内部
 	"tulip+lily": "hyacinth",
 	"lily+bluebell": "lotus",
