@@ -19,6 +19,9 @@ var seed_inventory: Array[String] = []
 ## 图鉴：已收录的品种
 var encyclopedia: Dictionary = {}  # plant_type → true
 
+## 已解锁的种子包：pack_id → true
+var unlocked_seed_packs: Dictionary = {}
+
 ## 花圃扩展参数
 const EXPAND_TRIGGER: int = 5   # 每收集5种新花
 const EXPAND_AMOUNT: int = 3    # 解锁3格
@@ -28,7 +31,14 @@ const MAX_GARDEN_SIZE: int = 20 # 最大20格
 func _ready() -> void:
 	garden_plots.resize(garden_size)
 	garden_plots.fill(null)
-	seed_inventory = ["rose_red", "daisy_white", "tulip_yellow"]
+	seed_inventory = [
+		"rose_gallica", "rose_canina",
+		"daisy_wild", "sunflower_wild",
+		"tulip_wild", "lily_candidum",
+		"orchid_wild",
+		"succulent_echeveria",
+		"cactus_barrel",
+	]
 
 
 ## 获取指定格位的植物
@@ -382,6 +392,34 @@ func _check_garden_expansion() -> void:
 		if garden_size == 9 and not "succulent_echeveria" in seed_inventory:
 			seed_inventory.append("succulent_echeveria")
 		EventBus.garden_expanded.emit(garden_size)
+	# 检查种子包解锁
+	_check_seed_pack_unlock()
+
+
+## 检查种子包解锁（根据图鉴收录数达到里程碑）
+func _check_seed_pack_unlock() -> void:
+	var count := encyclopedia.size()
+	for pack_id in PlantData.SEED_PACKS:
+		var pack: Dictionary = PlantData.SEED_PACKS[pack_id]
+		if unlocked_seed_packs.has(pack_id):
+			continue
+		if count >= pack.milestone:
+			unlocked_seed_packs[pack_id] = true
+			# 将种子包内品种加入种子库
+			var species_list: Array = pack.species
+			for species in species_list:
+				if not species in seed_inventory:
+					seed_inventory.append(species)
+			EventBus.seed_pack_unlocked.emit(pack_id, pack.name)
+	# 计算下一个里程碑并发送进度信号
+	var next_milestone := -1
+	for pack_id in PlantData.SEED_PACKS:
+		var pack: Dictionary = PlantData.SEED_PACKS[pack_id]
+		if not unlocked_seed_packs.has(pack_id):
+			if next_milestone == -1 or pack.milestone < next_milestone:
+				next_milestone = pack.milestone
+	if next_milestone != -1:
+		EventBus.milestone_progress.emit(count, next_milestone)
 
 
 ## 序列化
@@ -404,6 +442,7 @@ func to_dictionary() -> Dictionary:
 		"seed_inventory": seed_inventory,
 		"encyclopedia": encyclopedia,
 		"flower_storage": storage_data,
+		"unlocked_seed_packs": unlocked_seed_packs,
 	}
 
 
@@ -444,5 +483,8 @@ func from_dictionary(data: Dictionary) -> void:
 	for fid in invalid_keys:
 		vase_flower_positions.erase(fid)
 	seed_inventory.clear()
-	for s in data.get("seed_inventory", ["rose_red", "daisy_white", "tulip_yellow"]):
+	for s in data.get("seed_inventory", ["rose_gallica", "rose_canina", "daisy_wild",
+			"sunflower_wild", "tulip_wild", "lily_candidum", "orchid_wild",
+			"succulent_echeveria", "cactus_barrel"]):
 		seed_inventory.append(s)
+	unlocked_seed_packs = data.get("unlocked_seed_packs", {})

@@ -23,6 +23,11 @@ signal rare_flower_found(plant_type: String)
 signal garden_changed()
 signal garden_expanded(new_size: int)
 
+# 进度
+signal seed_pack_unlocked(pack_id: String, pack_name: String)
+signal milestone_progress(current: int, next_milestone: int)
+signal breeding_compat_result(compat_level: int, compat_name: String)
+
 # 桌面
 signal desktop_changed()
 

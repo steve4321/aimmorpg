@@ -80,8 +80,16 @@ func new_game() -> void:
 	GameState.vase_flower_ids.clear()
 	GameState.vase_flower_positions.clear()
 	GameState.flower_storage.clear()
-	GameState.seed_inventory = ["rose_red", "daisy_white", "tulip_yellow"]
+	GameState.seed_inventory = [
+		"rose_gallica", "rose_canina",
+		"daisy_wild", "sunflower_wild",
+		"tulip_wild", "lily_candidum",
+		"orchid_wild",
+		"succulent_echeveria",
+		"cactus_barrel",
+	]
 	GameState.encyclopedia = {}
+	GameState.unlocked_seed_packs = {}
 	if has_save():
 		var dir := DirAccess.open("user://")
 		if dir != null:
