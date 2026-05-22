@@ -2,6 +2,7 @@ extends Control
 ## 花圃网格管理：创建/管理所有格子，处理交互
 
 const PLOT_SCENE := preload("res://scenes/ui/garden_plot.tscn")
+const SEED_PACK_POPUP_SCENE := preload("res://scenes/ui/seed_pack_popup.tscn")
 
 @onready var grid_container: GridContainer = $Background/Margin/VBox/ScrollContainer/GridContainer
 @onready var seed_menu: Control = $SeedMenu
@@ -56,6 +57,7 @@ func _connect_signals() -> void:
 	EventBus.garden_expanded.connect(_on_garden_expanded)
 	EventBus.game_loaded.connect(_on_game_loaded)
 	EventBus.flower_stored.connect(_on_flower_stored)
+	EventBus.seed_pack_unlocked.connect(_on_seed_pack_unlocked)
 
 	seed_menu.seed_selected.connect(_on_seed_selected)
 	seed_menu.cancelled.connect(_on_seed_menu_cancelled)
@@ -215,6 +217,16 @@ func _on_garden_expanded(new_size: int) -> void:
 
 func _on_game_loaded() -> void:
 	_build_grid()
+
+
+func _on_seed_pack_unlocked(pack_id: String, _pack_name: String) -> void:
+	var popup: Control = SEED_PACK_POPUP_SCENE.instantiate()
+	add_child(popup)
+	popup.popup(pack_id)
+	popup.closed.connect(func():
+		popup.queue_free()
+		_update_info()
+	)
 
 
 func _on_encyclopedia_pressed() -> void:
