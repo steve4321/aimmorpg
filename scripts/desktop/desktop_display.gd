@@ -29,11 +29,27 @@ var _drag_wh_start_pos: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
+	_setup_window()
 	_load_save()
 	_connect_signals()
 	_refresh_vase()
 	_build_warehouse_list()
 	_update_warehouse_visibility()
+
+
+func _setup_window() -> void:
+	# 适配 MacBook Pro 等高分辨率屏幕
+	var screen_size := DisplayServer.screen_get_size()
+	var window_width := int(screen_size.x * 0.4)
+	var window_height := int(window_width * 720.0 / 1280.0)  # 保持 16:9 比例
+	window_height = mini(window_height, int(screen_size.y * 0.25))
+	DisplayServer.window_set_size(Vector2i(window_width, window_height))
+	var window_pos := Vector2i(
+		(screen_size.x - window_width) / 2,
+		screen_size.y - window_height
+	)
+	DisplayServer.window_set_position(window_pos)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_ALWAYS_ON_TOP, true)
 
 
 func _load_save() -> void:

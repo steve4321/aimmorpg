@@ -111,28 +111,28 @@ func setup(target: Control, plant_type: String) -> void:
 	_target = target
 	# 只在首次初始化时读取原始值，防止重复setup读取已被动画修改的值
 	if not _initialized:
-	    _original_rotation = target.rotation
-	    _original_scale = target.scale
-	    _original_position = target.position
-	    _initialized = true
+		_original_rotation = target.rotation
+		_original_scale = target.scale
+		_original_position = target.position
+		_initialized = true
 	else:
-	    # 后续setup先重置回原始状态
-	    target.rotation = _original_rotation
-	    target.scale = _original_scale
-	    target.position = _original_position
+		# 后续setup先重置回原始状态
+		target.rotation = _original_rotation
+		target.scale = _original_scale
+		target.position = _original_position
 
 	# 查找预设：精确匹配 → 前缀匹配 → 默认
 	_preset = IDLE_PRESETS.get(plant_type, {})
 	if _preset.is_empty():
-	    var prefix: String = plant_type.split("_")[0]
-	    for key in IDLE_PRESETS:
-	        if key == "_default":
-	            continue
-	        if key.begins_with(prefix) or prefix.begins_with(key):
-	            _preset = IDLE_PRESETS[key]
-	            break
+		var prefix: String = plant_type.split("_")[0]
+		for key in IDLE_PRESETS:
+			if key == "_default":
+				continue
+			if key.begins_with(prefix) or prefix.begins_with(key):
+				_preset = IDLE_PRESETS[key]
+				break
 	if _preset.is_empty():
-	    _preset = IDLE_PRESETS["_default"]
+		_preset = IDLE_PRESETS["_default"]
 
 	# 随机相位偏移，避免多朵花同步摇摆
 	_phase_offset = randf() * TAU
@@ -141,16 +141,16 @@ func setup(target: Control, plant_type: String) -> void:
 
 func stop() -> void:
 	if _target != null and is_instance_valid(_target):
-	    _target.rotation = _original_rotation
-	    _target.scale = _original_scale
-	    _target.position = _original_position
+		_target.rotation = _original_rotation
+		_target.scale = _original_scale
+		_target.position = _original_position
 	set_process(false)
 
 
 func _process(delta: float) -> void:
 	if _target == null or not is_instance_valid(_target):
-	    set_process(false)
-	    return
+		set_process(false)
+		return
 
 	_timer += delta
 	var t: float = _timer + _phase_offset
@@ -163,10 +163,10 @@ func _process(delta: float) -> void:
 	# 呼吸（缩放脉冲）
 	var breathe: float = _preset.get("breathe", 0.0)
 	if breathe > 0.0:
-	    var s: float = 1.0 + sin(t * 1.5) * breathe
-	    _target.scale = _original_scale * s
+		var s: float = 1.0 + sin(t * 1.5) * breathe
+		_target.scale = _original_scale * s
 
 	# 弹跳
 	var bounce: float = _preset.get("bounce", 0.0)
 	if bounce > 0.0:
-	    _target.position.y = _original_position.y - abs(sin(t * 2.0)) * bounce * 5.0
+		_target.position.y = _original_position.y - abs(sin(t * 2.0)) * bounce * 5.0
