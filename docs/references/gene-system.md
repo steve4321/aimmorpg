@@ -137,13 +137,13 @@ func is_golden_sunflower(genes: Dictionary) -> bool:
 
 # 月光百合
 func is_moonlight_lily(genes: Dictionary) -> bool:
-    return genes.r < 50 and genes.g > 200 and genes.b > 200
+	return genes.r < 80 and genes.g > 180 and genes.b > 180
 
-# 永恒之花
-func is_eternal_flower(genes: Dictionary) -> bool:
-    var all_high = (genes.r > 200 and genes.g > 200 and genes.b > 200)
-    var all_low = (genes.r < 50 and genes.g < 50 and genes.b < 50)
-    return all_high or all_low
+# 永恒之花（仅兰系，RGB均>230的高亮白花）
+func is_eternal_flower(genes: Dictionary, group: int) -> bool:
+	if group != PlantData.BreedingGroup.ORCHID:
+		return false
+	return genes.r > 230 and genes.g > 230 and genes.b > 230
 ```
 
 ### 4.2 稀有花检查流程
@@ -151,13 +151,15 @@ func is_eternal_flower(genes: Dictionary) -> bool:
 ```
 培育完成
     ↓
-检查基因突变
-    ↓
-应用突变
-    ↓
-检查稀有条件 ──→ 满足 ──→ 生成稀有花
-    ↓ 不满足
-生成普通花
+检查稀有条件（3%基本概率）
+    ↓ 满足3%
+检查稀有花颜色条件（按优先级）
+    ├── 匹配 → 生成稀有花
+    └── 不匹配 → 进入杂交判定
+    ↓ 不满足3%
+进入杂交判定（27%）
+    ├── 匹配杂交表 → 生成同组杂交种
+    └── 不匹配 → 生成混色
 ```
 
 ## 5. 完整培育流程
