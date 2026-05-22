@@ -1,7 +1,9 @@
 # Flower Desktop — 美术资源命名规则与配置方法
 
-> 最后更新: 2026-04-30
-> 状态: 规范初稿，待美术确认后生效
+> 最后更新: 2026-05-22
+> 状态: 规范已确认
+>
+> ⚠️ **v2.0 品种数已扩展至 105 种**（81 花卉 + 6 多肉 + 3 仙人掌 + 15 稀有）。下图录示例仅包含旧版 27 种，完整最新品种列表参见 [`docs/references/asset-prompts.md`](references/asset-prompts.md)。**命名规则本身未变**，仍按 `{type}_{stage_index}_{stage_name}.png` 格式。
 
 ---
 
@@ -26,20 +28,20 @@ res://
 ├── assets/
 │   ├── sprites/                     # 所有 2D 精灵资源
 │   │   ├── plants/                  # 植物精灵（动态着色白底）
-│   │   │   ├── flower/              # 花卉（17种）
+│   │   │   ├── flower/              # 花卉（81种，旧版目录示例为17种）
 │   │   │   │   ├── rose_red_0_seed.png
 │   │   │   │   ├── rose_red_1_sprout.png
 │   │   │   │   ├── rose_red_2_seedling.png
 │   │   │   │   ├── rose_red_3_mature.png
 │   │   │   │   ├── rose_red_4_flowering.png
 │   │   │   │   ├── ...
-│   │   │   ├── succulent/           # 多肉（4种）
+│   │   │   ├── succulent/           # 多肉（6种）
 │   │   │   │   ├── succulent_echeveria_0_seed.png
 │   │   │   │   ├── ...
-│   │   │   ├── cactus/              # 仙人掌（1种）
+│   │   │   ├── cactus/              # 仙人掌（3种）
 │   │   │   │   ├── cactus_0_seed.png
 │   │   │   │   ├── ...
-│   │   │   └── rare/                # 稀有花（5种）
+│   │   │   └── rare/                # 稀有花（15种）
 │   │   │       ├── rare_rainbow_rose_0_seed.png
 │   │   │       ├── ...
 │   │   ├── ui/                      # UI 资源
@@ -621,38 +623,6 @@ func check_resource_status() -> Dictionary:
 
 ---
 
-## 10. 快速参考表
+## 10. 快速参考
 
-### 完整植物品种 → 文件名映射（17+4+1+5 = 27 种）
-
-| 品种代码 | 开花阶段文件名 |
-|---------|--------------|
-| rose_red | `rose_red_4_flowering.png` |
-| rose_pink | `rose_pink_4_flowering.png` |
-| rose_white | `rose_white_4_flowering.png` |
-| sakura | `sakura_4_flowering.png` |
-| peony | `peony_4_flowering.png` |
-| daisy_white | `daisy_white_4_flowering.png` |
-| sunflower | `sunflower_4_flowering.png` |
-| carnation | `carnation_4_flowering.png` |
-| gesang | `gesang_4_flowering.png` |
-| gypsophila | `gypsophila_4_flowering.png` |
-| tulip_yellow | `tulip_yellow_4_flowering.png` |
-| tulip_orange | `tulip_orange_4_flowering.png` |
-| tulip_purple | `tulip_purple_4_flowering.png` |
-| lily | `lily_4_flowering.png` |
-| hyacinth | `hyacinth_4_flowering.png` |
-| lavender | `lavender_4_flowering.png` |
-| orchid | `orchid_4_flowering.png` |
-| succulent_echeveria | `succulent_echeveria_4_flowering.png` |
-| succulent_haworthia | `succulent_haworthia_4_flowering.png` |
-| succulent_bear | `succulent_bear_4_flowering.png` |
-| succulent_dragon | `succulent_dragon_4_flowering.png` |
-| cactus | `cactus_4_flowering.png` |
-| rare_rainbow_rose | `rare_rainbow_rose_4_flowering.png` (+ glow) |
-| rare_dark_mandrake | `rare_dark_mandrake_4_flowering.png` (+ glow) |
-| rare_golden_sunflower | `rare_golden_sunflower_4_flowering.png` (+ glow) |
-| rare_moonlight_lily | `rare_moonlight_lily_4_flowering.png` (+ glow) |
-| rare_eternal_flower | `rare_eternal_flower_4_flowering.png` (+ glow) |
-
-**总计**：27 × 5 = **135 张植物精灵** + 27 张剪影 + 5 张稀有花发光层
+品种映射表已迁移至 [`docs/references/asset-prompts.md`](references/asset-prompts.md)，`asset-prompts.md` 包含全部 105 种的开花阶段文件名和生成参数。

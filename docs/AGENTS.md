@@ -1,5 +1,7 @@
 # AGENTS.md - Flower Desktop Project
 
+> ⚠️ **v2.0 Update**: Breeding & discovery system has been overhauled. GeneSystem now uses botanical 5-level compatibility + DISCOVERY_TABLE (genus-based) instead of old simple color mixing. Full details → see [`docs/references/gene-system.md`](references/gene-system.md). The old code examples below are preserved as reference but may not match current implementation.
+
 ## Project Overview
 Desktop flower cultivation game with breeding and collection. Built with Godot 4.x.
 Three spaces: desktop vase (display) + garden (gameplay) + breeding room (breeding).
@@ -153,6 +155,8 @@ Prefer signals for:
 - UI updates (garden changed, encyclopedia updated)
 - Discovery events (new flower discovered, rare flower found)
 
+> ⚠️ **v2.0 added new signals** (below). The list below is a subset; check actual `event_bus.gd` for the full set.
+
 Use EventBus pattern to decouple systems:
 ```gdscript
 # EventBus.gd (autoload)
@@ -171,6 +175,11 @@ signal garden_expanded(new_size: int)
 signal desktop_changed()
 signal game_saved()
 signal game_loaded()
+# v2.0 additions:
+signal seed_pack_unlocked(pack_id: String)    # Milestone seed pack unlocked
+signal milestone_progress(current: int, milestone: int)  # Encyclopedia progress
+signal breeding_compat_result(level: int)      # Botanical compatibility feedback
+signal plant_selected_for_breeding(plot_id: int, plant_type: String)  # Breeding room flow
 
 # broadcaster.gd
 EventBus.plant_watered.emit(plot_id)
@@ -265,7 +274,10 @@ func to_dictionary() -> Dictionary:
     }
 ```
 
-### Gene System (Color Mixing & Breeding)
+### Gene System (Color Mixing & Breeding) — ⚠️ v2.0 Simplified Reference
+
+> ⚠️ **Current implementation has been significantly expanded.** The old simple `mix_colors` + `check_rare` has been replaced with a full botanical compatibility system with 5 compatibility levels (same genus → same family → same group → different group → different family), `DISCOVERY_TABLE` (genus-pair lookup), `blend_color` & `color_drift` discovery methods. 15 rare species (not 5). See [`gene-system.md`](references/gene-system.md) and [`plant_data.gd`](../scripts/core/plant_data.gd).
+
 ```gdscript
 # scripts/autoload/gene_system.gd
 class_name GeneSystem extends Node
